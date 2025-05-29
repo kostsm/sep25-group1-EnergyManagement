@@ -1,0 +1,17 @@
+{
+  "name": "sep25-group1-energymanagement",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dashboard-ui/vite.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kostsm/sep25-group1-EnergyManagement.git"
+  },
+  "private": true,
+  "dependencies": {
+    "vite": "^6.3.5"
+  }
+}
