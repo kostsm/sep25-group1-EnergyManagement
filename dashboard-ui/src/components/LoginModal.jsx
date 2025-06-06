@@ -12,7 +12,7 @@ export default function LoginModal({ onSuccess, onClose }) {
         setLoading(true);
         setError("");
         try {
-            await axios.post("http://localhost:5174/api/login", { email, password });
+            await axios.post("http://localhost:8081/api/users/login", { email, password });
             onSuccess(email);
         } catch (err) {
             setError(err.response?.data?.error || "Login failed");
