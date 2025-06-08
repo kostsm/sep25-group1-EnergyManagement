@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function LoginModal({ onSuccess, onClose }) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+export default function CreateFlatModal({ userId, onSuccess, onClose }) {
+    const [address, setAddress] = useState("");
+    const [city, setCity] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -12,12 +12,16 @@ export default function LoginModal({ onSuccess, onClose }) {
         setLoading(true);
         setError("");
         try {
-            const response = await axios.post("http://localhost:8081/api/users/login", { email, password });
-            // Assuming the backend returns { id: ..., email: ... } on success
-            const userData = response.data;
-            onSuccess(userData); // Pass the user data to the onSuccess callback
+            // Send POST request to create a new flat
+            await axios.post("http://localhost:8082/api/flats", {
+                address,
+                city,
+                userId // Include the userId to associate the flat
+            });
+            onSuccess(); // Call success callback (closes modal, re-fetches flats)
         } catch (err) {
-            setError(err.response?.data?.error || "Login failed");
+            console.error("Error creating flat:", err);
+            setError(err.response?.data?.error || "Failed to create flat.");
         } finally {
             setLoading(false);
         }
@@ -26,22 +30,24 @@ export default function LoginModal({ onSuccess, onClose }) {
     return (
         <div style={styles.overlay}>
             <div style={styles.modal}>
-                <h2>Log In</h2>
+                <h2>Add New Flat</h2>
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: 12 }}>
-                        <label>Email:<br/>
-                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={styles.input} />
+                        <label>Address:<br/>
+                            <input type="text" value={address} onChange={e => setAddress(e.target.value)} required style={styles.input} />
                         </label>
                     </div>
                     <div style={{ marginBottom: 12 }}>
-                        <label>Password:<br/>
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={styles.input} />
+                        <label>City:<br/>
+                            <input type="text" value={city} onChange={e => setCity(e.target.value)} required style={styles.input} />
                         </label>
                     </div>
+
                     {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
+
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
                         <button type="button" onClick={onClose} style={styles.buttonSecondary} disabled={loading}>Cancel</button>
-                        <button type="submit" style={styles.buttonPrimary} disabled={loading}>{loading ? "Logging in..." : "Log In"}</button>
+                        <button type="submit" style={styles.buttonPrimary} disabled={loading}>{loading ? "Adding..." : "Add Flat"}</button>
                     </div>
                 </form>
             </div>
@@ -49,6 +55,7 @@ export default function LoginModal({ onSuccess, onClose }) {
     );
 }
 
+// Basic styles - ideally these would be in a shared CSS file or utility classes
 const styles = {
     overlay: {
         position: 'fixed',
@@ -75,7 +82,7 @@ const styles = {
         marginTop: 4
     },
     buttonPrimary: {
-        background: '#2563eb',
+        background: '#10b981',
         color: '#fff',
         border: 'none',
         borderRadius: 6,

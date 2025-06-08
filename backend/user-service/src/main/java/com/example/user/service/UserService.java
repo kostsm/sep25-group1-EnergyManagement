@@ -2,6 +2,7 @@ package com.example.user.service;
 
 import com.example.user.model.User;
 import com.example.user.repository.UserRepository;
+import com.example.user.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +24,16 @@ public class UserService {
         return "User registered successfully";
     }
 
-    public String login(String email, String password) {
+    public UserDto login(String email, String password) {
         User user = userRepository.findByEmail(email);
         if (user == null || !user.getPassword().equals(password)) { // TODO: Encrypt password
-            return "Invalid email or password";
+            return null; // Indicate login failure
         }
-        return "User logged in successfully";
+        return new UserDto(user.getId(), user.getEmail()); // Return UserDto on success
     }
 
     public String getCurrentUser() {
-        // TODO: Implement get current user logic
+        // TODO: Implement get current user logic (requires security context)
         return "Current user info";
     }
 } 
