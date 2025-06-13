@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/heating")
@@ -57,5 +59,25 @@ public class HeatingController {
         return service.create(hs);
     }
 
+    @GetMapping("/total-usage")
+    public Map<String, Object> getTotalHeatingUsage() {
+        Double value = service.getTotalHeatingUsage();
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalHeatingUsage", value);
+        return result;
+    }
+
+    @GetMapping("/average-usage")
+    public Map<String, Object> getAverageHeatingUsage() {
+        Double value = service.getAverageHeatingUsage();
+        Map<String, Object> result = new HashMap<>();
+        result.put("averageHeatingUsage", value);
+        return result;
+    }
+
+    @GetMapping("/count")
+    public Long getTotalHeatingCount() {
+        return service.getTotalHeatingCount();
+    }
 
 }

@@ -26,6 +26,15 @@ export default function Dashboard({ userId }) {
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [showAddModal,   setShowAddModal]   = useState(false);
 
+    /* ─── statistics panel state ────────────────────────────── */
+    const [stats, setStats] = useState({
+        totalFlats: null,
+        totalHeatingUsage: null,
+        averageHeatingUsage: null,
+    });
+    const [statsLoading, setStatsLoading] = useState(true);
+    const [statsError, setStatsError] = useState(null);
+
     /* ──────────────────────────────────────────────────────────────── */
     /*  Data fetch helpers                                             */
     /* ──────────────────────────────────────────────────────────────── */
@@ -62,6 +71,28 @@ export default function Dashboard({ userId }) {
 
     };
 
+    // Refactored statistics fetch function
+    const fetchStats = async () => {
+        setStatsLoading(true);
+        setStatsError(null);
+        try {
+            const [flatsRes, totalUsageRes, avgUsageRes] = await Promise.all([
+                axios.get("/api/statistics/total-flats"),
+                axios.get("/api/statistics/total-heating-usage"),
+                axios.get("/api/statistics/average-heating-usage"),
+            ]);
+            setStats({
+                totalFlats: flatsRes.data.totalFlats,
+                totalHeatingUsage: totalUsageRes.data.totalHeatingUsage,
+                averageHeatingUsage: avgUsageRes.data.averageHeatingUsage,
+            });
+        } catch (err) {
+            setStatsError("Failed to load statistics");
+        } finally {
+            setStatsLoading(false);
+        }
+    };
+
     /* ──────────────────────────────────────────────────────────────── */
     /*  initial dashboard mock                                         */
     /* ──────────────────────────────────────────────────────────────── */
@@ -94,10 +125,18 @@ export default function Dashboard({ userId }) {
         fetchFlatDetails(selectedFlatId);
     }, [selectedFlatId]);
 
+    /* ──────────────────────────────────────────────────────────────── */
+    /*  load statistics for current user                                */
+    /* ──────────────────────────────────────────────────────────────── */
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
     /* ─── modal callbacks ──────────────────────────────────────────── */
     const handleCreateFlatSuccess = () => {
         setShowCreateFlatModal(false);
         fetchUserFlats(userId);
+        fetchStats(); // Update statistics after creating a flat
     };
 
     const handleEditSuccess = () => {
@@ -109,6 +148,7 @@ export default function Dashboard({ userId }) {
     const handleAddHeatingSuccess = () => {
         fetchFlatDetails(selectedFlatId);
         setShowAddModal(false);
+        fetchStats(); // Update statistics after adding a heating source
     };
 
     /* ─── delete flat ──────────────────────────────────────────────── */
@@ -117,9 +157,22 @@ export default function Dashboard({ userId }) {
         try {
             await axios.delete(`/api/flats/${flatId}`, { headers: { "X-User-ID": userId } });
             fetchUserFlats(userId);
+            fetchStats(); // Update statistics after deleting a flat
         } catch (err) {
             console.error(err);
             alert("Failed to delete flat.");
+        }
+    };
+
+    // Add this function to handle heating source deletion
+    const handleDeleteHeatingSource = async (heatingId) => {
+        try {
+            await axios.delete(`http://localhost:8083/api/heating/${heatingId}`);
+            fetchFlatDetails(selectedFlatId);
+            fetchStats(); // Update statistics after deleting a heating source
+        } catch (err) {
+            alert("Failed to delete heating source.");
+            console.error(err);
         }
     };
 
@@ -132,127 +185,134 @@ export default function Dashboard({ userId }) {
     /* ──────────────────────────────────────────────────────────────── */
     return (
         <div className="container mx-auto p-4">
-            {/* ===== Overview cards ===== */}
-            <h1 className="text-2xl font-semibold mb-6">Smart-City Energy Dashboard</h1>
-
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card title="Total Flats"           value={overview.totalFlats} />
-                <Card title="Registered Citizens"   value={overview.totalCitizens} />
-                <Card title="Avg Consumption (kWh)" value={overview.avgConsumption} />
-            </div>
-
-            {/* ===== Heating mix demo ===== */}
-            <section className="mt-10">
-                <h2 className="text-xl font-medium mb-2">Heating Source Mix</h2>
-                <ul className="list-disc ml-6 space-y-1">
-                    {overview.mix.map(m => (
-                        <li key={m.type}>{m.type}: {m.percent}%</li>
-                    ))}
-                </ul>
-            </section>
-
-            {/* ===== User flats ===== */}
-            <section className="mt-10">
-                <h2 className="text-xl font-medium mb-2">Your Flats</h2>
-
-                {flatsLoading ? (
-                    <p className="text-gray-500">Loading your flats…</p>
-                ) : flatsError ? (
-                    <p className="text-red-600">{flatsError}</p>
-                ) : userFlats.length ? (
-                    <ul className="list-disc ml-6 space-y-1">
-                        {userFlats.map(flat => (
-                            <li key={flat.id} className="flex justify-between items-center">
-                                <button
-                                    onClick={() => setSelectedFlatId(flat.id)}
-                                    className="underline text-blue-600"
-                                >
-                                    {flat.address}, {flat.city} (ID: {flat.id})
-                                </button>
-
-                                <div>
-                                    <button
-                                        onClick={() => { setFlatToEdit(flat); setShowEditFlatModal(true); }}
-                                        className="ml-2 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteClick(flat.id)}
-                                        className="ml-2 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+            {/* Statistics Panel at the top */}
+            <aside style={{ minWidth: 280, borderBottom: '2px solid #e5e7eb' }} className="bg-white rounded-2xl shadow p-6 h-fit mb-8">
+                <h2 className="text-lg font-bold mb-4">Statistics</h2>
+                {statsLoading ? (
+                    <p className="text-gray-500">Loading…</p>
+                ) : statsError ? (
+                    <p className="text-red-600">{statsError}</p>
                 ) : (
-                    <p>You have no flats registered yet.</p>
+                    <ul className="space-y-2">
+                        <li><span className="font-medium">Total Flats:</span> {stats.totalFlats}</li>
+                        <li><span className="font-medium">Total Heating Usage:</span> {stats.totalHeatingUsage} kWh</li>
+                        <li><span className="font-medium">Average Heating Usage:</span> {stats.averageHeatingUsage} kWh</li>
+                    </ul>
                 )}
+            </aside>
+            <div className="container mx-auto p-4 flex flex-col md:flex-row gap-8">
+                <div className="flex-1">
+                    {/* ===== User flats ===== */}
+                    <section className="mt-10">
+                        <h2 className="text-xl font-medium mb-2">Your Flats</h2>
 
-                <button
-                    onClick={() => setShowCreateFlatModal(true)}
-                    className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                    Add New Flat
-                </button>
-            </section>
+                        {flatsLoading ? (
+                            <p className="text-gray-500">Loading your flats…</p>
+                        ) : flatsError ? (
+                            <p className="text-red-600">{flatsError}</p>
+                        ) : userFlats.length ? (
+                            <ul className="list-disc ml-6 space-y-1">
+                                {userFlats.map(flat => (
+                                    <li key={flat.id} className="flex justify-between items-center">
+                                        <button
+                                            onClick={() => setSelectedFlatId(flat.id)}
+                                            className="underline text-blue-600"
+                                        >
+                                            {flat.address}, {flat.city} (ID: {flat.id})
+                                        </button>
 
-            {/* ===== Heating details for selected flat ===== */}
-            {selectedFlatId && (
-                <section className="mt-10">
-                    <h2 className="text-xl font-medium mb-2">
-                        Heating sources for flat #{selectedFlatId}
-                    </h2>
-
-                    {detailsLoading ? (
-                        <p className="text-gray-500">Loading heating sources…</p>
-                    ) : Array.isArray(flatDetails?.heatingSources) &&
-                    flatDetails.heatingSources.length ? (
-                        <>
-                            <table className="table-auto border mb-4">
-                                <thead>
-                                <tr><th>ID</th><th>Type</th><th>Power&nbsp;(kW)</th></tr>
-                                </thead>
-                                <tbody>
-                                {flatDetails.heatingSources.map(h => (
-                                    <tr key={h.id}>
-                                        <td className="border px-2">{h.id}</td>
-                                        <td className="border px-2">{h.type}</td>
-                                        <td className="border px-2">{h.power}</td>
-                                    </tr>
+                                        <div>
+                                            <button
+                                                onClick={() => { setFlatToEdit(flat); setShowEditFlatModal(true); }}
+                                                className="ml-2 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteClick(flat.id)}
+                                                className="ml-2 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </li>
                                 ))}
-                                </tbody>
-                            </table>
+                            </ul>
+                        ) : (
+                            <p>You have no flats registered yet.</p>
+                        )}
 
-                            <button
-                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                onClick={() => setShowAddModal(true)}
-                            >
-                                Add heating source
-                            </button>
-                        </>
-                    ) : Array.isArray(flatDetails?.heatingSources) ? (
-                        <>
-                            <p>No heating sources yet.</p>
-                            <button
-                                className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                onClick={() => setShowAddModal(true)}
-                            >
-                                Add heating source
-                            </button>
-                        </>
-                    ) : (
-                        /* final fallback — guards against undefined/null */
-                        <p className="text-red-600">
-                            Unexpected response from server &nbsp;
-                            <small>(open console for details)</small>
-                        </p>
+                        <button
+                            onClick={() => setShowCreateFlatModal(true)}
+                            className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                            Add New Flat
+                        </button>
+                    </section>
+
+                    {/* ===== Heating details for selected flat ===== */}
+                    {selectedFlatId && (
+                        <section className="mt-10">
+                            <h2 className="text-xl font-medium mb-2">
+                                Heating sources for flat #{selectedFlatId}
+                            </h2>
+
+                            {detailsLoading ? (
+                                <p className="text-gray-500">Loading heating sources…</p>
+                            ) : Array.isArray(flatDetails?.heatingSources) &&
+                            flatDetails.heatingSources.length ? (
+                                <>
+                                    <table className="table-auto border mb-4">
+                                        <thead>
+                                        <tr><th>ID</th><th>Type</th><th>Power&nbsp;(kW)</th></tr>
+                                        </thead>
+                                        <tbody>
+                                        {flatDetails.heatingSources.map(h => (
+                                            <tr key={h.id}>
+                                                <td className="border px-2">{h.id}</td>
+                                                <td className="border px-2">{h.type}</td>
+                                                <td className="border px-2">{h.power}</td>
+                                                <td>
+                                                    <button
+                                                        onClick={() => handleDeleteHeatingSource(h.id)}
+                                                        className="ml-2 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+
+                                    <button
+                                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        onClick={() => setShowAddModal(true)}
+                                    >
+                                        Add heating source
+                                    </button>
+                                </>
+                            ) : Array.isArray(flatDetails?.heatingSources) ? (
+                                <>
+                                    <p>No heating sources yet.</p>
+                                    <button
+                                        className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        onClick={() => setShowAddModal(true)}
+                                    >
+                                        Add heating source
+                                    </button>
+                                </>
+                            ) : (
+                                /* final fallback — guards against undefined/null */
+                                <p className="text-red-600">
+                                    Unexpected response from server &nbsp;
+                                    <small>(open console for details)</small>
+                                </p>
+                            )}
+                        </section>
                     )}
-                </section>
-            )}
-
+                </div>
+            </div>
 
             {/* ─── Modals ─────────────────────────────────────────────── */}
             {showCreateFlatModal && (

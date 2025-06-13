@@ -44,4 +44,16 @@ public class HeatingService {
     }
 
     public void delete(Long id) { repo.deleteById(id); }
+
+    public Double getTotalHeatingUsage() {
+        return repo.getTotalHeatingUsage();
+    }
+
+    public Double getAverageHeatingUsage() {
+        return repo.getAverageHeatingUsage();
+    }
+
+    public Long getTotalHeatingCount() {
+        return repo.count();
+    }
 }

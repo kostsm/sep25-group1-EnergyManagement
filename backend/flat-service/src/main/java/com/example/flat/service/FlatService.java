@@ -6,6 +6,8 @@ import com.example.flat.repository.FlatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.client.WebClient;
+import com.example.flat.dto.HeatingSourceDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,9 @@ public class FlatService {
 
     @Autowired
     private FlatRepository flatRepository;
+
+    @Autowired
+    private WebClient webClient;
 
     public Flat createFlat(Flat flat) {
         validateFlat(flat);
@@ -66,6 +71,16 @@ public class FlatService {
         // Authorization check
         if (!flat.getUserId().equals(requestingUserId)) {
             throw new FlatException("You are not authorized to delete this flat");
+        }
+
+        // Cascade delete: delete all heating sources for this flat
+        String url = "http://localhost:8083/api/heating/by-flat/" + id;
+        // Get all heating sources for this flat
+        HeatingSourceDto[] sources = webClient.get().uri(url).retrieve().bodyToMono(HeatingSourceDto[].class).block();
+        if (sources != null) {
+            for (HeatingSourceDto source : sources) {
+                webClient.delete().uri("http://localhost:8083/api/heating/" + source.getId()).retrieve().toBodilessEntity().block();
+            }
         }
 
         flatRepository.deleteById(id);

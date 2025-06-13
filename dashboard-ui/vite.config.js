@@ -6,7 +6,10 @@ export default defineConfig({
     server: {
         port: 5173,
         proxy: {
-            '/api': 'http://localhost:8082',
+            '/api/users': 'http://localhost:8081',
+            '/api/flats': 'http://localhost:8082',
+            '/api/heating': 'http://localhost:8083',
+            '/api/statistics': 'http://localhost:8084',
         },
     },
     build: {
