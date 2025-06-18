@@ -45,7 +45,7 @@ export default function Dashboard({ userId }) {
         setFlatsLoading(true);
         setFlatsError(null);
 
-        axios.get(`http://localhost:8082/api/flats/user/${currentUserId}`)
+        axios.get(`http://localhost:8080/api/flats/user/${currentUserId}`)
             .then(res => { setUserFlats(res.data);  setFlatsLoading(false); })
             .catch(err => { console.error(err);
                 setFlatsError("Failed to fetch your flats.");
@@ -57,7 +57,7 @@ export default function Dashboard({ userId }) {
 
         setDetailsLoading(true);
         axios
-            .get(`http://localhost:8082/api/flats/${flatId}/details`, {
+            .get(`http://localhost:8080/api/flats/${flatId}/details`, {
                 headers: { "X-User-ID": userId },
             })
             .then((res) => {
@@ -77,9 +77,9 @@ export default function Dashboard({ userId }) {
         setStatsError(null);
         try {
             const [flatsRes, totalUsageRes, avgUsageRes] = await Promise.all([
-                axios.get("/api/statistics/total-flats"),
-                axios.get("/api/statistics/total-heating-usage"),
-                axios.get("/api/statistics/average-heating-usage"),
+                axios.get("http://localhost:8080/api/statistics/total-flats"),
+                axios.get("http://localhost:8080/api/statistics/total-heating-usage"),
+                axios.get("http://localhost:8080/api/statistics/average-heating-usage"),
             ]);
             setStats({
                 totalFlats: flatsRes.data.totalFlats,
@@ -155,7 +155,7 @@ export default function Dashboard({ userId }) {
     const handleDeleteClick = async (flatId) => {
         if (!window.confirm("Are you sure you want to delete this flat?")) return;
         try {
-            await axios.delete(`/api/flats/${flatId}`, { headers: { "X-User-ID": userId } });
+            await axios.delete(`http://localhost:8080/api/flats/${flatId}`, { headers: { "X-User-ID": userId } });
             fetchUserFlats(userId);
             fetchStats(); // Update statistics after deleting a flat
         } catch (err) {
@@ -167,7 +167,7 @@ export default function Dashboard({ userId }) {
     // Add this function to handle heating source deletion
     const handleDeleteHeatingSource = async (heatingId) => {
         try {
-            await axios.delete(`http://localhost:8083/api/heating/${heatingId}`);
+            await axios.delete(`http://localhost:8080/api/heating/${heatingId}`);
             fetchFlatDetails(selectedFlatId);
             fetchStats(); // Update statistics after deleting a heating source
         } catch (err) {

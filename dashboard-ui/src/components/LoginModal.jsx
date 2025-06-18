@@ -12,7 +12,7 @@ export default function LoginModal({ onSuccess, onClose }) {
         setLoading(true);
         setError("");
         try {
-            const response = await axios.post("http://localhost:8081/api/users/login", { email, password });
+            const response = await axios.post("http://localhost:8080/api/users/login", { email, password });
             // Assuming the backend returns { id: ..., email: ... } on success
             const userData = response.data;
             onSuccess(userData); // Pass the user data to the onSuccess callback

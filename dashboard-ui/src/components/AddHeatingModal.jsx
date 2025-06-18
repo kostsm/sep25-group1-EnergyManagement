@@ -6,7 +6,7 @@ export default function AddHeatingModal({ flatId, onSuccess, onClose }) {
     const [power, setPower] = useState("");
 
     const submit = () => {
-        axios.post("http://localhost:8083/api/heating", {
+        axios.post("http://localhost:8080/api/heating", {
             type,
             power: Number(power),
             flatId

@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/heating")
-@CrossOrigin
 public class HeatingController {
 
     private final HeatingService service;

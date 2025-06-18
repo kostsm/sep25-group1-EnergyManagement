@@ -13,7 +13,7 @@ export default function CreateFlatModal({ userId, onSuccess, onClose }) {
         setError("");
         try {
             // Send POST request to create a new flat
-            await axios.post("http://localhost:8082/api/flats", {
+            await axios.post("http://localhost:8080/api/flats", {
                 address,
                 city,
                 userId // Include the userId to associate the flat

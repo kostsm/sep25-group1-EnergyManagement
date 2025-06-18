@@ -20,7 +20,7 @@ export default function EditFlatModal({ flat, onSuccess, onClose }) {
         setError("");
         try {
             // Send PUT request to update the flat
-            await axios.put(`http://localhost:8082/api/flats/${flat.id}`, {
+            await axios.put(`http://localhost:8080/api/flats/${flat.id}`, {
                 id: flat.id, // Include ID in body as well
                 address,
                 city,
