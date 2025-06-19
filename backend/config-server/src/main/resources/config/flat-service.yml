@@ -15,6 +15,4 @@ spring:
   h2:
     console:
       enabled: true
-      path: /h2-console # Enable H2 console for this service as well
-  config:
-    import: optional:configserver:http://localhost:8888
+      path: /h2-console # Enable H2 console for this service as well 

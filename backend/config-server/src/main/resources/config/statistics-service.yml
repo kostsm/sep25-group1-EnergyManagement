@@ -1,10 +1,8 @@
 server:
-  port: 8083
+  port: 8084
 spring:
   application:
-    name: heating-service
-  config:
-    import: optional:configserver:http://localhost:8888
+    name: statistics-service
 
 eureka:
   client:

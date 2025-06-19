@@ -25,6 +25,8 @@ export default function EditFlatModal({ flat, onSuccess, onClose }) {
                 address,
                 city,
                 userId: flat.userId // Ensure userId is included and not changed
+            }, {
+                headers: { "X-User-ID": flat.userId }
             });
             onSuccess(); // Call success callback (closes modal, re-fetches flats)
         } catch (err) {

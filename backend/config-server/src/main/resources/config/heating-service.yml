@@ -3,8 +3,6 @@ server:
 spring:
   application:
     name: heating-service
-  config:
-    import: optional:configserver:http://localhost:8888
 
 eureka:
   client:
