@@ -76,7 +76,7 @@ Legend:
 
 ### 2. Run API Gateway (New terminal)
 ```bash
-./mvnw -pl backend/api-gateway         -am spring-boot:run
+./mvnw -f backend/api-gateway spring-boot:run
 ```
 Gateway starts on http://localhost:8080 and exposes global CORS (see CorsGlobalConfig.java).
 
