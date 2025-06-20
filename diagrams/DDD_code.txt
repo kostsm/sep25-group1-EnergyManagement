@@ -1,0 +1,33 @@
+---
+config:
+  theme: base
+  themeVariables:
+    fontSize: '12'
+  layout: dagre
+---
+flowchart TB
+ subgraph subGraph0["User BC"]
+        UserDomain["User<br>Aggregate"]
+  end
+ subgraph subGraph1["Flat BC"]
+        FlatDomain["Flat<br>Aggregate"]
+  end
+ subgraph subGraph2["Heating BC"]
+        HeatingDomain["HeatingSource<br>Aggregate"]
+  end
+ subgraph subGraph3["Statistics BC"]
+        StatsDomain["Statistics<br>Projection"]
+  end
+ subgraph System["System"]
+        GW["API Gateway"]
+        REG["Eureka"]
+        CFG["Config Server"]
+  end
+    UserDomain -- Customer / Supplier --> FlatDomain
+    FlatDomain -- Customer / Supplier --> HeatingDomain
+    FlatDomain -- Conformist --> StatsDomain
+    HeatingDomain -- Conformist --> StatsDomain
+     GW:::infra
+     REG:::infra
+     CFG:::infra
+    classDef infra fill:#f4f4f4,stroke:#999,font-style:italic
