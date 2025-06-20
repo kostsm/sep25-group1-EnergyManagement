@@ -109,5 +109,13 @@ All Mermaid code and diagrams can be found in **/diagrams** folder
 - architecture_code.text → Architecture diagram (architecture_SEP.png)
 - DDD_code.txt → DDD context map (DDD_diagram.png)
 
+## API Documentation
+Each microservice exposes its own API documentation via Swagger UI.
+After starting the services, you can access the documentation at:
+- User Service: http://localhost:8081/swagger-ui.html
+- Flat Service: http://localhost:8082/swagger-ui.html
+- Heating Service: http://localhost:8083/swagger-ui.html
+- Statistics Service: http://localhost:8084/swagger-ui.html
+
 
 
