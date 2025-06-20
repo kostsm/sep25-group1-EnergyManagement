@@ -11,7 +11,6 @@
 	<packaging>pom</packaging>          <!-- 🔸 change from "jar" to "pom" -->
 
 	<modules>                           <!-- 🔸 list every child that has a pom.xml -->
-		<module>backend/common-lib</module>
 		<module>backend/api-gateway</module>
 		<module>backend/config-server</module>
 		<module>backend/service-registry</module>
@@ -19,7 +18,6 @@
 		<module>backend/flat-service</module>
 		<module>backend/heating-service</module>
 		<module>backend/statistics-service</module>
-		<module>backend/recommendation-service</module>
 		<!-- add dashboard-ui if you later wrap it with the frontend-maven-plugin -->
 	</modules>
 
