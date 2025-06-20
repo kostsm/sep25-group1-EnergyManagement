@@ -3,3 +3,16 @@ server:
 spring:
   application:
     name: service-registry 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    prometheus:
+      metrics:
+        export:
+          enabled: true
