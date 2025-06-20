@@ -1,6 +1,5 @@
 package com.example.flat.dto;
 
-/** mirror of heating-service entity; keep it minimal */
 public class HeatingSourceDto {
 
     private Long   id;

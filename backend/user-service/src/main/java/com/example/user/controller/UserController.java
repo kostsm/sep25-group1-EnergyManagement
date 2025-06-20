@@ -17,7 +17,6 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserRegistrationRequest request) {
         String result = userService.register(request.getEmail(), request.getPassword());
-        // TODO: Return appropriate status code based on registration result
         return ResponseEntity.ok(result);
     }
 

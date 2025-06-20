@@ -16,9 +16,6 @@ public class Flat {
 
     private String address;
     private String city;
-
-    // Assuming a simple long for user_id for now. 
-    // A proper relationship would involve fetching User from user-service or using a shared library for User DTO.
     private Long userId; 
 
     // Getters and setters

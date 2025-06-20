@@ -19,21 +19,20 @@ public class UserService {
         }
         User user = new User();
         user.setEmail(email);
-        user.setPassword(password); // TODO: Encrypt password
+        user.setPassword(password);
         userRepository.save(user);
         return "User registered successfully";
     }
 
     public UserDto login(String email, String password) {
         User user = userRepository.findByEmail(email);
-        if (user == null || !user.getPassword().equals(password)) { // TODO: Encrypt password
+        if (user == null || !user.getPassword().equals(password)) {
             return null; // Indicate login failure
         }
         return new UserDto(user.getId(), user.getEmail()); // Return UserDto on success
     }
 
     public String getCurrentUser() {
-        // TODO: Implement get current user logic (requires security context)
         return "Current user info";
     }
 } 

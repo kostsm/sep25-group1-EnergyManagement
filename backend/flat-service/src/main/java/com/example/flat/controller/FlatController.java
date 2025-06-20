@@ -92,7 +92,4 @@ public class FlatController {
         FlatDto dto = new FlatDto(flat, sources);
         return ResponseEntity.ok(dto);
     }
-
-
-    // TODO: Add endpoints for filtering/finding flats by user, neighborhood, etc.
 } 

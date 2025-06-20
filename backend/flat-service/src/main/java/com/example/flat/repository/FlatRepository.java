@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface FlatRepository extends JpaRepository<Flat, Long> {
-    // Custom query methods can be added here if needed, e.g., findByUserId
+    // Custom query methods can be added here
     List<Flat> findByUserId(Long userId);
 } 

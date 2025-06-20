@@ -104,6 +104,4 @@ public class FlatService {
             throw new FlatException("User ID is required");
         }
     }
-
-    // TODO: Add methods for filtering/finding flats by user, neighborhood, etc.
 } 
