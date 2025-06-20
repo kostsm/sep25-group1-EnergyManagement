@@ -18,3 +18,16 @@ spring:
       path: /h2-console # Enable H2 console for this service as well
   config:
     import: optional:configserver:http://localhost:8888
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    prometheus:
+      metrics:
+        export:
+          enabled: true

@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+#Avoid tracking log state
+C:/promtail/positions.yaml
+C:/logs/
+
+# ignore prometheus log data
+prometheus/data/  
