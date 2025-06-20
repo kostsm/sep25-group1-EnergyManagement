@@ -12,8 +12,10 @@ export default function LoginModal({ onSuccess, onClose }) {
         setLoading(true);
         setError("");
         try {
-            await axios.post("http://localhost:5174/api/login", { email, password });
-            onSuccess(email);
+            const response = await axios.post("http://localhost:8080/api/users/login", { email, password });
+            // Assuming the backend returns { id: ..., email: ... } on success
+            const userData = response.data;
+            onSuccess(userData); // Pass the user data to the onSuccess callback
         } catch (err) {
             setError(err.response?.data?.error || "Login failed");
         } finally {

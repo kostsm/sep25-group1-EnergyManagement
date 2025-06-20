@@ -13,7 +13,7 @@ export default function RegisterModal({ onClose }) {
         setLoading(true);
         setError("");
         try {
-            await axios.post("http://localhost:5174/api/register", { email, password });
+            await axios.post("http://localhost:8080/api/users/register", { email, password });
             setSuccess(true);
             setTimeout(onClose, 1200);
         } catch (err) {
