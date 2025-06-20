@@ -1,0 +1,46 @@
+---
+config:
+  theme: base
+  themeVariables:
+    fontSize: '12'
+---
+flowchart LR
+ subgraph Dashboard["Dashboard"]
+        CitizenUI["Citizen UI"]
+  end
+ subgraph Edge["Edge"]
+        APIGW(["API Gateway"])
+  end
+ subgraph s1["Micro-services"]
+        UserSvc(["User Service<br>(accounts &amp; auth)"])
+        FlatSvc(["Flat Service<br>(flats &amp; residents)"])
+        HeatSvc(["Heating Service<br>(heat sources)"])
+        StatsSvc(["Statistics Service<br>(zip-level stats)"])
+        ConfSvc(["Config Server<br>(cfg for all MCS)"])
+        n1["All MCS"]
+  end
+ subgraph subGraph3["Databases (H2)"]
+        UserDB[("UserDB")]
+        FlatDB[("FlatDB")]
+        HeatDB[("HeatDB")]
+        StatsDB[("StatsDB")]
+  end
+ subgraph Infrastructure["Infrastructure"]
+        Registry(["Eureka 8761"])
+  end
+    CitizenUI -- HTTPS --> APIGW
+    APIGW --> UserSvc & FlatSvc & HeatSvc & StatsSvc
+    HeatSvc -- REST --> StatsSvc
+    FlatSvc -- REST --> StatsSvc
+    UserSvc --> UserDB
+    FlatSvc --> FlatDB
+    HeatSvc --> HeatDB
+    StatsSvc --> StatsDB
+    APIGW <--> Registry
+    UserSvc <--> Registry
+    FlatSvc <--> Registry
+    HeatSvc <--> Registry
+    StatsSvc <--> Registry
+    ConfSvc --> n1
+    UserSvc -. "has (userId)" .-> FlatSvc
+  FlatSvc -. "has (flatId)" .-> HeatSvc
